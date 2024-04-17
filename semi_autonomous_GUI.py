@@ -1,11 +1,9 @@
 import cv2
-import numpy as np
+#import numpy as np
 import weld_joint
 import grbl_gcode
-#import util_funcs.displayimg
 import time
 import copy
-
 import os
 
 #clear old GCODE file

@@ -5,17 +5,14 @@ from rdp import rdp
 class process_img:
     def __init__(self, img_path,background=None):
         self.img_path = img_path
-        #self.img_read = cv2.imread(self.img_path) #NON GUI
-        #self.img_in_processing = self.img_read #NON GUI
-        self.img_in_processing = self.img_path #FOR GUI
+        self.img_in_processing = self.img_path 
         self.contours = []
         self.hierarchy = []
         self.gray = []
         self.saturate = []
         self.thresh = []
         self.contour_area = []
-        #self.background = cv2.imread(background) #NON GUI
-        self.background = background #FOR GUI
+        self.background = background
 
     def img_crop(self, h_start,h_end, w_start,w_end):
         self.h_start = h_start
@@ -43,42 +40,33 @@ class process_img:
         
     def img_detect_GRAY_contours(self):
         self.gray = cv2.cvtColor(self.img_in_processing, cv2.COLOR_RGB2GRAY)
-        _, self.thresh = cv2.threshold(self.gray, 10, 255, cv2.THRESH_BINARY)  # 0-255, 0-black, 255-white https://docs.opencv.org/3.4/d7/d4d/tutorial_py_thresholding.html
-        # self.thresh = cv2. adaptiveThreshold(self.gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11,2)
+        _, self.thresh = cv2.threshold(self.gray, 10, 255, cv2.THRESH_BINARY)
         self.thresh = cv2.morphologyEx(self.thresh, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(11,11)))
-
         self.contours, self.hierarchy = cv2.findContours(self.thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     
     def img_detect_GRAY_contours_adaptive(self):
         self.gray = cv2.cvtColor(self.img_in_processing, cv2.COLOR_RGB2GRAY)
         self.thresh = cv2. adaptiveThreshold(self.gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 11,2)
         self.thresh = cv2.morphologyEx(self.thresh, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(11,11)))
-
         self.contours, self.hierarchy = cv2.findContours(self.thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     
     def img_detect_HSV_contours(self):
         self.saturate = cv2.cvtColor(self.img_in_processing, cv2.COLOR_RGB2HSV)
-        self.thresh = cv2.inRange(self.saturate, (0,50,0), (50,255,200)) #ORIGNAL
-        #self.thresh = cv2.inRange(self.saturate, (0,0,0), (255,255,25)) #for background subtraction
+        self.thresh = cv2.inRange(self.saturate, (0,50,0), (50,255,200))
         self.thresh = cv2.morphologyEx(self.thresh, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(9,9)))
         self.contours, self.hierarchy = cv2.findContours(self.thresh[self.crop_height, self.crop_width], cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE, offset=(self.w_start, self.h_start))
-        #print(self.hierarchy)
-        #self.contours = np.array(self.contours)
         
     def img_draw_contours(self):
         self.img_in_processing = cv2.drawContours(self.img_read, self.contours, -1, (0, 0, 255), thickness = 10)
         
     def largest_contour(self):
-        #print(self.hierarchy,self.contours)
         for i in range(len(self.hierarchy[0])):
             areaN = cv2.contourArea(self.contours[i])
             self.contour_area.append(areaN)
         self.contour_area = np.array(self.contour_area)
         max_area_idx = np.argmax(self.contour_area)
         self.contour_area = self.contour_area[max_area_idx]
-        self.contours = self.contours[max_area_idx]
-        #print(self.contour_area)
-        
+        self.contours = self.contours[max_area_idx]       
         
             
 def radius_intersect(cont1, cont2, radius = None):
@@ -107,7 +95,7 @@ def radius_intersect(cont1, cont2, radius = None):
         
     #contour containing "weld joint"
     if len(idx_delete[0]) < 1000:
-        print("NO INTERSECTION")
+        #print("NO INTERSECTION")
         intersection_contour = None
     else: 
         intersection_contour = cont1_delete
@@ -116,13 +104,10 @@ def radius_intersect(cont1, cont2, radius = None):
 
 def find_aruco_corners(img,camera_matrix=None,dist_coeffs=None):
     aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
-    #img = cv2.imread(img) #CHANGE IF USING GUI VS MAIN.PY
     if ((camera_matrix is not None) & (dist_coeffs is not None)):
         img = cv2.undistort(img, camera_matrix, dist_coeffs) 
     params = cv2.aruco.DetectorParameters()
     marker_corners, marker_ids, _ = cv2.aruco.detectMarkers(img, aruco_dict, parameters= params)
-    print(marker_corners)
-
     return marker_corners
     
 def transform_points(path, corners,ratio=None):
@@ -142,7 +127,6 @@ def intersect_cleanup(intersection_contour,e=None):
     intersection_contour = intersection_contour.squeeze()
     cleaned = rdp(intersection_contour,epsilon=e,algo="rec")
     cleaned = cleaned[None,:,None]
-    print(np.size(cleaned))
     return cleaned
  
 def detect_movement(frame,background_object):
@@ -164,11 +148,6 @@ def draw_intersection(frame,intersection_contour):
         image = cv2.circle(frame, (intersection_contour[0][i][0][0],intersection_contour[0][i][0][1]), radius=3, color=(255,255,255), thickness=-1)
     return image
     
-    
-    
- 
- 
- 
 #Auto px to real world mm Calibration function isn't that great, manual calibration with a ruler works better (then double check by actually moving the machine)
 def mm_to_px_ratio(corners, aruco_size_mm=None):
     avg_dist = 0

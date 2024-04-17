@@ -2,7 +2,7 @@ from tkinter import *
 from PIL import Image, ImageTk
 import cv2
 import customtkinter
-import numpy as np
+#import numpy as np
 import weld_joint
 import grbl_gcode
 import copy
@@ -19,6 +19,10 @@ class App(customtkinter.CTk):
         self.resizable(width=False, height=False)
         customtkinter.set_appearance_mode("dark")
         
+        #clear old GCODE file
+        if os.path.isfile("gcode.txt"):
+            os.remove("gcode.txt")
+            
         #initialize contours as empty
         self.contours1 = None
         self.contours2 = None
@@ -85,7 +89,8 @@ class App(customtkinter.CTk):
         cv2_img = cv2.drawContours(self.frame, self.contours2, -1, (0,255,0), thickness = 7)
         
         if (self.joint_intersection is not None):
-            cv2_img = weld_joint.draw_intersection(self.frame, self.joint_intersection)
+            cv2_img = weld_joint.draw_intersection(self.frame,self.joint_intersection)
+            #cv2_img = weld_joint.draw_intersection(self.frame, self.joint_intersection)
         
         cv2_img =  cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGBA)
         cap_img = Image.fromarray(cv2_img)
@@ -142,7 +147,7 @@ class App(customtkinter.CTk):
         self.grid_slaves(row=3, column=2)[0].configure(state=self.img2_state)
         self.GCODE_state = DISABLED
         self.grid_slaves(row=4, column=1)[0].configure(state=self.GCODE_state)
-        print("background reset")
+        print("Background Reset")
     
     def joint(self):
         if ((self.contours1 is not None) & (self.contours2 is not None) & (self.corners is not None)):
@@ -161,7 +166,7 @@ class App(customtkinter.CTk):
                 self.path_wrt_aruco = weld_joint.intersect_cleanup(self.path_wrt_aruco,e=0.45)
                 self.tf_contours = False
             else:
-                print("No ARUCO TAG")
+                print("No ArUco Tag Found")
             
                               
     def gcode(self):
