@@ -162,7 +162,7 @@ class  App(customtkinter.CTk):
                 inter = copy.deepcopy(self.joint_intersection)
                 pxmmratio = weld_joint.mm_to_px_ratio(self.corners, aruco_size_mm=50)
                 print(pxmmratio)
-                self.path_wrt_aruco = weld_joint.transform_points(inter,self.corners,ratio=(.244))
+                self.path_wrt_aruco = weld_joint.transform_points(inter,self.corners,ratio=(.2422))
                 self.path_wrt_aruco = weld_joint.intersect_cleanup(self.path_wrt_aruco,e=0.45)
                 self.tf_contours = False
             else:

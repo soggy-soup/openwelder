@@ -40,7 +40,7 @@ class process_img:
         
     def img_detect_GRAY_contours(self):
         self.gray = cv2.cvtColor(self.img_in_processing, cv2.COLOR_RGB2GRAY)
-        _, self.thresh = cv2.threshold(self.gray, 25, 255, cv2.THRESH_BINARY)
+        _, self.thresh = cv2.threshold(self.gray, 24, 255, cv2.THRESH_BINARY)
         self.thresh = cv2.morphologyEx(self.thresh, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(11,11)))
         self.contours, self.hierarchy = cv2.findContours(self.thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     
