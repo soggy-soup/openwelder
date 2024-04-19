@@ -40,7 +40,7 @@ class process_img:
         
     def img_detect_GRAY_contours(self):
         self.gray = cv2.cvtColor(self.img_in_processing, cv2.COLOR_RGB2GRAY)
-        _, self.thresh = cv2.threshold(self.gray, 10, 255, cv2.THRESH_BINARY)
+        _, self.thresh = cv2.threshold(self.gray, 25, 255, cv2.THRESH_BINARY)
         self.thresh = cv2.morphologyEx(self.thresh, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(11,11)))
         self.contours, self.hierarchy = cv2.findContours(self.thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     
@@ -95,7 +95,6 @@ def radius_intersect(cont1, cont2, radius = None):
         
     #contour containing "weld joint"
     if len(idx_delete[0]) < 1000:
-        #print("NO INTERSECTION")
         intersection_contour = None
     else: 
         intersection_contour = cont1_delete
@@ -114,10 +113,6 @@ def transform_points(path, corners,ratio=None):
     x1,y1 = corners[0][0][0]
     x2,y2 = corners[0][0][3]
     theta = np.arctan((y1-y2)/(x1-x2)) 
-    print(x1)
-    print(y1)
-    print(x2)
-    print(y2)
     path[:,:,:,0] = ((path[:,:,:,0]-x1)*np.cos(theta))+((y1-path[:,:,:,1])*np.sin(theta))
     path[:,:,:,1] = (-(path[:,:,:,0]-x1)*np.sin(theta))+((y1-path[:,:,:,1])*np.cos(theta))
     transformed_path = np.round(ratio*path,2)

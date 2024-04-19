@@ -9,7 +9,7 @@ import copy
 import time
 import os
 
-class App(customtkinter.CTk):
+class  App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
         
@@ -48,7 +48,7 @@ class App(customtkinter.CTk):
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT,1744)#3496 or 1744 for 30 fps
         self.cap.set(cv2.CAP_PROP_AUTOFOCUS, 0)
         time.sleep(2)
-        self.cap.set(cv2.CAP_PROP_FOCUS, 0) #set camera focus
+        self.cap.set(cv2.CAP_PROP_FOCUS, 50) #set camera focus
         self.video_win_width, self.video_win_height = 800, int(800/video_aspect_ratio)     
         
         #create video stream label
@@ -151,7 +151,7 @@ class App(customtkinter.CTk):
     
     def joint(self):
         if ((self.contours1 is not None) & (self.contours2 is not None) & (self.corners is not None)):
-            self.joint_intersection = weld_joint.radius_intersect(self.contours1,self.contours2,radius=35)
+            self.joint_intersection = weld_joint.radius_intersect(self.contours1,self.contours2,radius=12)
             if (self.joint_intersection is not None) & (self.corners != ()):
                 self.intersection_state = DISABLED
                 self.grid_slaves(row=3, column=3)[0].configure(state=self.intersection_state)
@@ -162,7 +162,7 @@ class App(customtkinter.CTk):
                 inter = copy.deepcopy(self.joint_intersection)
                 pxmmratio = weld_joint.mm_to_px_ratio(self.corners, aruco_size_mm=50)
                 print(pxmmratio)
-                self.path_wrt_aruco = weld_joint.transform_points(inter,self.corners,ratio=(.248))
+                self.path_wrt_aruco = weld_joint.transform_points(inter,self.corners,ratio=(.244))
                 self.path_wrt_aruco = weld_joint.intersect_cleanup(self.path_wrt_aruco,e=0.45)
                 self.tf_contours = False
             else:
